@@ -83,6 +83,7 @@ function getPreviewSrc(photo: PhotoData) {
           return isLive ? (
             <div
               class="viewer-pro-item"
+              data-uid={photo.sec_uid}
               data-live-photo
               data-image={src}
               data-video={videoSrc}
@@ -97,6 +98,8 @@ function getPreviewSrc(photo: PhotoData) {
           ) : (
             <div
               class="viewer-pro-item"
+              data-uid={photo.sec_uid}
+              data-blurhash={photo.blurhash}
               data-full-src={previewSrc}
               data-name={photo.name}
               data-width={photo.width}
@@ -121,6 +124,8 @@ function getPreviewSrc(photo: PhotoData) {
   import { LivePhotoViewer } from "live-photo";
   import { ViewerPro, type ViewerItem } from "viewer-pro";
   import { decode } from "blurhash";
+  import { createPhotoInfoPanel } from "../lib/photo-info-panel";
+  import "../styles/photo-info-panel.css";
 
   function blurhashToDataURL(hash: string, w = 32, h = 32): string | undefined {
     try {
@@ -201,6 +206,7 @@ function getPreviewSrc(photo: PhotoData) {
     const images: ViewerItem[] = nodes.map((el) => {
       const live = el.hasAttribute("data-live-photo");
       return {
+        id: el.dataset.uid || "",
         src: el.dataset.fullSrc || "",
         thumbnail:
           (el.querySelector("img") as HTMLImageElement | null)?.src ||
@@ -317,6 +323,7 @@ function getPreviewSrc(photo: PhotoData) {
 
     const viewer = new ViewerPro({
       images,
+      infoRender: (item) => createPhotoInfoPanel(String(item.id || "")),
       renderNode,
       onImageLoad,
       onTransformChange,
