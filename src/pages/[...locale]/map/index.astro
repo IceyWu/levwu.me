@@ -131,6 +131,7 @@ const { alternates, locale, t } = getLocalePageContext(
         </button>
       </div>
     </div>
+
   </main>
 </Layout>
 
@@ -157,6 +158,12 @@ const { alternates, locale, t } = getLocalePageContext(
       const url = new URL(baseUrl ?? "", window.location.href);
       url.searchParams.set("theme", getTheme());
       url.searchParams.set("lang", document.documentElement.lang);
+      const topic = new URL(window.location.href).searchParams.get("topic");
+      if (topic) {
+        url.searchParams.set("topic", topic);
+      } else {
+        url.searchParams.delete("topic");
+      }
       url.searchParams.set("t", String(Date.now()));
       return url.href;
     };
@@ -184,6 +191,26 @@ const { alternates, locale, t } = getLocalePageContext(
         new URL(baseUrl).origin,
       );
     };
+
+    window.addEventListener("message", (event: MessageEvent) => {
+      if (event.source !== iframe.contentWindow || event.origin !== new URL(baseUrl ?? "", window.location.href).origin) return;
+      if (event.data?.channel !== "lifepalette-map") return;
+      if (event.data.type === "map-ready") {
+        sendTheme();
+      } else if (event.data.type === "topic-change") {
+        const url = new URL(window.location.href);
+        if (typeof event.data.topic === "string" && event.data.topic) {
+          url.searchParams.set("topic", event.data.topic);
+        } else {
+          url.searchParams.delete("topic");
+        }
+        window.history.replaceState(window.history.state, "", url);
+      } else if (event.data.type === "photo-preview-open") {
+        document.querySelector(".map-toolbar")?.classList.add("map-toolbar-hidden");
+      } else if (event.data.type === "photo-preview-close") {
+        document.querySelector(".map-toolbar")?.classList.remove("map-toolbar-hidden");
+      }
+    });
 
     const loadMap = () => {
       if (!baseUrl) return;
@@ -231,5 +258,10 @@ const { alternates, locale, t } = getLocalePageContext(
     bottom: max(1rem, env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
+  }
+
+  .map-toolbar-hidden {
+    visibility: hidden;
+    pointer-events: none;
   }
 </style>
