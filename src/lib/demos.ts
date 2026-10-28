@@ -11,6 +11,38 @@ interface DemoItem {
 
 export const demos: DemoItem[] = [
   {
+    cover: "/demos/metaprobe.png",
+    date: "2026-09-11",
+    description: {
+      en: "Rust-powered metadata extraction for images and videos.",
+      "zh-CN": "基于 Rust 的图像与视频元数据提取工具。",
+    },
+    link: "https://github.com/IceyWu/metaprobe",
+    title: "metaprobe",
+  },
+  {
+    cover: "/demos/mcp-hub.png",
+    date: "2026-07-12",
+    description: {
+      en: "MCP Hub — A domain hosting multiple MCP services, allowing AI Agents to directly call your tools.",
+      "zh-CN":
+        "MCP Hub — 一个域名托管多个 MCP 服务，让 AI Agent 直接调用你的工具",
+    },
+    link: "https://mcp.levwu.me",
+    title: "mcp-hub",
+  },
+  {
+    cover: "/demos/go-api-starter.png",
+    date: "2026-05-11",
+    description: {
+      en: "A production-oriented Go API starter for authentication, RBAC, file uploads, and asynchronous media processing.🎉",
+      "zh-CN":
+        "一个面向生产环境的 Go API 启动模板，支持认证、RBAC、文件上传与异步媒体处理。🎉",
+    },
+    link: "https://github.com/IceyWu/go-api-starter",
+    title: "go-api-starter",
+  },
+  {
     cover: "/demos/LifePalette.png",
     date: "2025-12-06",
     description: {
@@ -63,13 +95,13 @@ export const demos: DemoItem[] = [
     video: "/demos/ViewerPro.webm",
   },
   {
-    cover: "/demos/WordsEssence.gif",
+    cover: "/demos/WordsEssence.png",
     date: "2024-09-01",
     description: {
       en: "An app for daily quotations and inspiration from words.",
       "zh-CN": "收集每日摘录与文字灵感的应用。",
     },
-    link: "https://github.com/IceyWu/WordsEssence",
+    link: "https://wd.levwu.me",
     title: "WordsEssence",
   },
   {
