@@ -445,7 +445,12 @@ const friendProfile = {
       if (!response.ok) throw new Error("friend-links-request-failed");
       const payload = await response.json() as { data?: Array<{ name: string; site_title: string; site_url: string; avatar_url: string; description: string }> };
       friendsList.replaceChildren();
-      payload.data?.forEach(renderApprovedFriend);
+      const friends = [...(payload.data ?? [])];
+      for (let index = friends.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [friends[index], friends[randomIndex]] = [friends[randomIndex], friends[index]];
+      }
+      friends.forEach(renderApprovedFriend);
       const count = friendsList.querySelectorAll("li").length;
       const countText = friendCountLabel?.dataset.countTemplate?.replace("{count}", String(count)) ?? String(count);
       if (friendCountLabel) friendCountLabel.textContent = countText;
