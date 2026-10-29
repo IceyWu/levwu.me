@@ -58,12 +58,42 @@ export interface Dict {
     archiveLabel: string;
     homeLabel: string;
     countLabel: string;
+    loading: string;
+    empty: string;
+    loadFailed: string;
+    retry: string;
     openFriendLabel: string;
     contactTitle: string;
-    contact: {
-      start: string;
-      link: string;
-      end: string;
+    profile: {
+      siteTitle: string;
+      siteDescription: string;
+      name: string;
+      avatar: string;
+      avatarLink: string;
+      website: string;
+      copy: string;
+      copied: string;
+      copyFailed: string;
+    };
+    application: {
+      open: string;
+      title: string;
+      description: string;
+      name: string;
+      siteTitle: string;
+      website: string;
+      avatar: string;
+      email: string;
+      about: string;
+      submit: string;
+      submitting: string;
+      success: string;
+      error: string;
+      duplicateEmail: string;
+      duplicateSite: string;
+      rateLimited: string;
+      close: string;
+      privacy: string;
     };
   };
   home: {
@@ -218,13 +248,43 @@ const zhCN: Dict = {
   },
   friends: {
     archiveLabel: "友邻列表",
-    contact: {
-      end: " 与我联系。",
-      link: "GitHub",
-      start: "如果你也在认真维护自己的网络空间，欢迎通过 ",
-    },
     contactTitle: "交换友链",
     countLabel: "共 {count} 位友邻",
+    loading: "正在加载友邻…",
+    empty: "这里还没有友邻。",
+    loadFailed: "友邻加载失败，请重试。",
+    retry: "重试",
+    profile: {
+      siteTitle: "网站名称",
+      siteDescription: "网站简介",
+      name: "站点主人",
+      avatar: "主人头像",
+      avatarLink: "查看头像",
+      website: "网站地址",
+      copy: "复制友链资料",
+      copied: "已复制",
+      copyFailed: "复制失败，请手动选择资料。",
+    },
+    application: {
+      about: "简单介绍一下你的网站",
+      avatar: "头像链接（选填）",
+      close: "关闭申请表",
+      description: "申请会先进入待审核列表，通过后才会展示在这里。",
+      email: "联系邮箱（选填）",
+      error: "提交失败，请稍后重试。",
+      duplicateEmail: "这个邮箱已有申请正在审核或已通过，请勿重复提交。",
+      duplicateSite: "这个网站已有申请正在审核或已通过。",
+      rateLimited: "提交太频繁，请稍后再试。",
+      name: "你的昵称",
+      open: "申请友链",
+      privacy: "邮箱选填，仅在填写后用于联系，不会公开展示。",
+      siteTitle: "网站名称",
+      submit: "提交申请",
+      submitting: "正在提交…",
+      success: "申请已收到，审核后会展示。",
+      title: "申请交换友链",
+      website: "网站地址（HTTPS）",
+    },
     homeLabel: "返回首页",
     intro: "在互联网的不同角落持续写作和创造的人。",
     openFriendLabel: "在新窗口打开 {name} 的网站",
@@ -404,14 +464,43 @@ const en: Dict = {
   },
   friends: {
     archiveLabel: "Friend list",
-    contact: {
-      end: ".",
-      link: "GitHub",
-      start:
-        "If you also maintain a space of your own on the web, reach out on ",
-    },
     contactTitle: "Exchange links",
     countLabel: "{count} friend",
+    loading: "Loading friends…",
+    empty: "No friends listed yet.",
+    loadFailed: "Couldn't load friends.",
+    retry: "Retry",
+    profile: {
+      siteTitle: "Site title",
+      siteDescription: "Description",
+      name: "Site owner",
+      avatar: "Avatar",
+      avatarLink: "View avatar",
+      website: "Website",
+      copy: "Copy friend-link details",
+      copied: "Copied",
+      copyFailed: "Could not copy. Select the details manually.",
+    },
+    application: {
+      about: "Tell me a little about your website",
+      avatar: "Avatar URL (optional)",
+      close: "Close application form",
+      description: "Applications are reviewed before they appear on this page.",
+      email: "Contact email (optional)",
+      error: "Could not submit your application. Please try again.",
+      duplicateEmail: "This email already has an application under review or approved.",
+      duplicateSite: "This website already has an application under review or approved.",
+      rateLimited: "Too many submissions. Please try again later.",
+      name: "Your name",
+      open: "Apply for a link",
+      privacy: "Email is optional. If provided, it is only used to contact you and will not be public.",
+      siteTitle: "Website title",
+      submit: "Submit application",
+      submitting: "Submitting…",
+      success: "Application received. It will be listed after review.",
+      title: "Apply for a friend link",
+      website: "Website URL (HTTPS)",
+    },
     homeLabel: "Back to home",
     intro:
       "People who keep writing and creating in their own corners of the internet.",

@@ -9,7 +9,6 @@ import {
   type LocalePageProps,
 } from "../../../i18n";
 import Layout from "../../../layouts/Layout.astro";
-import { friends } from "../../../lib/friends";
 
 export function getStaticPaths() {
   return getLocaleStaticPaths();
@@ -19,6 +18,13 @@ const { alternates, locale, t } = getLocalePageContext(
   Astro.props as LocalePageProps,
   "friends",
 );
+const friendProfile = {
+  name: "Lev Wu",
+  site_title: "Lev Wu",
+  site_url: "https://levwu.me/",
+  avatar_url: "https://avatars.githubusercontent.com/u/66096254?v=4",
+  description: "You only live once",
+};
 ---
 
 <Layout
@@ -40,89 +46,224 @@ const { alternates, locale, t } = getLocalePageContext(
           slot="meta"
           class="mt-4 text-xs tabular-nums text-black/35 dark:text-white/35"
         >
-          {interpolate(t.friends.countLabel, { count: friends.length })}
+          <span
+            data-friend-count
+            data-count-template={t.friends.countLabel}
+          >
+            {t.friends.loading}
+          </span>
         </p>
       </PageIntro>
 
+      <p class="sr-only" data-friends-live-status role="status" aria-live="polite">
+        {t.friends.loading}
+      </p>
+      <template data-friends-loading-template>
+        <li class="flex min-h-24 items-center gap-4 py-5 sm:gap-5" aria-hidden="true">
+          <span class="size-14 shrink-0 rounded-full bg-black/[0.06] dark:bg-white/[0.08]"></span>
+          <span class="min-w-0 flex-1 space-y-2">
+            <span class="block h-4 w-24 rounded bg-black/[0.06] dark:bg-white/[0.08]"></span>
+            <span class="block h-3 w-3/4 rounded bg-black/[0.045] dark:bg-white/[0.06]"></span>
+          </span>
+        </li>
+        <li class="flex min-h-24 items-center gap-4 py-5 sm:gap-5" aria-hidden="true">
+          <span class="size-14 shrink-0 rounded-full bg-black/[0.06] dark:bg-white/[0.08]"></span>
+          <span class="min-w-0 flex-1 space-y-2">
+            <span class="block h-4 w-20 rounded bg-black/[0.06] dark:bg-white/[0.08]"></span>
+            <span class="block h-3 w-2/3 rounded bg-black/[0.045] dark:bg-white/[0.06]"></span>
+          </span>
+        </li>
+      </template>
       <ul
         aria-label={t.friends.archiveLabel}
         class="divide-y divide-black/10 border-black/10 border-y dark:divide-white/10 dark:border-white/10"
+        data-friends-list
+        aria-busy="true"
+        data-loading-text={t.friends.loading}
+        data-empty-text={t.friends.empty}
+        data-load-failed-text={t.friends.loadFailed}
+        data-retry-text={t.friends.retry}
         data-page-enter-list
       >
-        {
-          friends.map((friend) => (
-            <li>
-              <a
-                href={friend.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={interpolate(t.friends.openFriendLabel, {
-                  name: friend.name,
-                })}
-                class="group flex min-h-24 items-center gap-4 py-5 no-underline sm:gap-5"
-              >
-                <span
-                  class="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black/[0.055] text-sm font-medium text-black/38 dark:bg-white/[0.09] dark:text-white/42"
-                >
-                  <span aria-hidden="true">{friend.name.slice(0, 1).toUpperCase()}</span>
-                  <img
-                    src={friend.avatar}
-                    alt={friend.name}
-                    width="56"
-                    height="56"
-                    loading="lazy"
-                    decoding="async"
-                    referrerpolicy="no-referrer"
-                    data-friend-avatar
-                    class="absolute inset-0 h-full w-full object-cover grayscale-[12%] transition group-hover:grayscale-0 motion-reduce:transition-none"
-                  />
-                </span>
-
-                <span class="min-w-0 flex-1">
-                  <span
-                    class="block text-base leading-6 font-medium text-black/82 group-hover:text-black dark:text-white/82 dark:group-hover:text-white"
-                  >
-                    {friend.name}
-                  </span>
-                  <span
-                    class="mt-1 block text-sm leading-6 text-black/48 dark:text-white/50"
-                  >
-                    {friend.description[locale]}
-                  </span>
-                </span>
-
-                <span
-                  aria-hidden="true"
-                  class="shrink-0 text-sm text-black/28 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 dark:text-white/30 motion-reduce:transition-none"
-                >
-                  ↗
-                </span>
-              </a>
-            </li>
-          ))
-        }
+        <li class="flex min-h-24 items-center gap-4 py-5 sm:gap-5" aria-hidden="true" data-friends-loading>
+          <span class="size-14 shrink-0 rounded-full bg-black/[0.06] dark:bg-white/[0.08]"></span>
+          <span class="min-w-0 flex-1 space-y-2">
+            <span class="block h-4 w-24 rounded bg-black/[0.06] dark:bg-white/[0.08]"></span>
+            <span class="block h-3 w-3/4 rounded bg-black/[0.045] dark:bg-white/[0.06]"></span>
+          </span>
+        </li>
+        <li class="flex min-h-24 items-center gap-4 py-5 sm:gap-5" aria-hidden="true" data-friends-loading>
+          <span class="size-14 shrink-0 rounded-full bg-black/[0.06] dark:bg-white/[0.08]"></span>
+          <span class="min-w-0 flex-1 space-y-2">
+            <span class="block h-4 w-20 rounded bg-black/[0.06] dark:bg-white/[0.08]"></span>
+            <span class="block h-3 w-2/3 rounded bg-black/[0.045] dark:bg-white/[0.06]"></span>
+          </span>
+        </li>
       </ul>
 
-      <section
-        aria-labelledby="friend-contact-title"
-        class="mt-16 max-w-xl sm:mt-20"
-        data-page-enter
-        style="--enter-stage: 3;"
+      <dialog
+        data-friend-application-dialog
+        aria-labelledby="friend-application-title"
+        class="m-auto max-h-[min(82dvh,40rem)] w-[min(92vw,42rem)] overflow-y-auto rounded-2xl border border-black/10 bg-white p-0 text-black shadow-2xl backdrop:bg-black/45 dark:border-white/12 dark:bg-[#171717] dark:text-white"
       >
-        <h2
-          id="friend-contact-title"
-          class="text-base font-medium text-black/80 dark:text-white/80"
+        <form
+          class="grid grid-cols-1 gap-x-4 gap-y-3 p-4 sm:grid-cols-2 sm:gap-y-3.5 sm:p-6"
+          data-friend-application-form
+          data-error-text={t.friends.application.error}
+          data-duplicate-email-text={t.friends.application.duplicateEmail}
+          data-duplicate-site-text={t.friends.application.duplicateSite}
+          data-rate-limited-text={t.friends.application.rateLimited}
+          data-success-text={t.friends.application.success}
+          data-submitting-text={t.friends.application.submitting}
         >
-          {t.friends.contactTitle}
-        </h2>
-        <p class="mt-2 text-sm leading-6 text-black/50 dark:text-white/52">
-          {t.friends.contact.start}<a
-            href="https://github.com/iceywu"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-black/75 underline decoration-black/25 underline-offset-4 hover:text-black dark:text-white/75 dark:decoration-white/30 dark:hover:text-white"
-          >{t.friends.contact.link}</a>{t.friends.contact.end}
-        </p>
+          <div class="col-span-full flex items-start justify-between gap-4 border-b border-black/8 pb-3 dark:border-white/10">
+            <div>
+              <h2 id="friend-application-title" class="text-lg font-semibold tracking-tight">
+                {t.friends.application.title}
+              </h2>
+              <p class="mt-1 text-sm leading-5 text-black/55 dark:text-white/55">
+                {t.friends.application.description}
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label={t.friends.application.close}
+              data-close-friend-application
+              class="-mr-2 -mt-2 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-xl text-black/50 hover:bg-black/5 dark:text-white/55 dark:hover:bg-white/10"
+            >
+              ×
+            </button>
+          </div>
+
+          <label class="grid gap-1.5 text-sm">
+            <span>{t.friends.application.name}<span aria-hidden="true" class="ml-1 text-rose-500">*</span></span>
+            <input name="name" required maxlength="80" autocomplete="name" class="min-h-10 rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span>{t.friends.application.siteTitle}<span aria-hidden="true" class="ml-1 text-rose-500">*</span></span>
+            <input name="site_title" required maxlength="120" class="min-h-10 rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span>{t.friends.application.website}<span aria-hidden="true" class="ml-1 text-rose-500">*</span></span>
+            <input name="site_url" type="url" required pattern="https://.*" placeholder="https://" maxlength="200" class="min-h-10 rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span>{t.friends.application.avatar}</span>
+            <input name="avatar_url" type="url" pattern="https://.*" placeholder="https://" maxlength="500" class="min-h-10 rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40" />
+          </label>
+          <label class="grid gap-1.5 text-sm">
+            <span>{t.friends.application.email}</span>
+            <input name="email" type="email" maxlength="254" autocomplete="email" class="min-h-10 rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40" />
+          </label>
+          <label class="col-span-full grid gap-1.5 text-sm">
+            <span>{t.friends.application.about}<span aria-hidden="true" class="ml-1 text-rose-500">*</span></span>
+            <textarea name="description" required maxlength="500" rows="2" class="resize-y rounded-lg border border-black/12 bg-transparent px-3 py-2 outline-none focus:border-black/35 dark:border-white/15 dark:focus:border-white/40"></textarea>
+          </label>
+          <label class="hidden" aria-hidden="true">
+            Company
+            <input name="company" tabindex="-1" autocomplete="off" />
+          </label>
+          <p class="col-span-full text-xs leading-4 text-black/45 dark:text-white/45">
+            {t.friends.application.privacy}
+          </p>
+          <p data-friend-application-status role="status" aria-live="polite" class="col-span-full hidden text-sm"></p>
+          <button
+            type="submit"
+            data-friend-application-submit
+            class="col-span-full inline-flex min-h-10 items-center justify-center rounded-full bg-black px-5 text-sm font-medium text-white transition hover:bg-black/80 disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-white/85 sm:justify-self-end sm:px-8"
+          >
+            {t.friends.application.submit}
+          </button>
+        </form>
+      </dialog>
+
+      <section
+        aria-labelledby="friend-profile-title"
+        class="mt-16 rounded-xl border border-black/10 bg-white/75 p-4 shadow-sm shadow-black/[0.025] dark:border-white/12 dark:bg-white/[0.035] dark:shadow-black/10 sm:mt-20 sm:p-5"
+        data-page-enter
+        style="--enter-stage: 4;"
+      >
+        <div class="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] sm:gap-0">
+          <div class="flex items-center gap-3 sm:pr-6">
+            <img
+              src={friendProfile.avatar_url}
+              alt={t.home.avatarAlt}
+              width="56"
+              height="56"
+              loading="lazy"
+              decoding="async"
+              class="size-14 shrink-0 rounded-full border border-black/8 object-cover dark:border-white/10"
+            />
+            <div class="min-w-0">
+              <h2 id="friend-profile-title" class="text-sm font-semibold text-black/85 dark:text-white/85">
+                Lev Wu
+              </h2>
+              <p class="mt-1 text-sm leading-5 text-black/55 dark:text-white/55">
+                You only live once
+              </p>
+            </div>
+          </div>
+
+          <dl class="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-2.5 border-t border-black/8 pt-4 text-xs leading-5 dark:border-white/10 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+            <dt class="text-black/45 dark:text-white/45">{t.friends.profile.siteTitle}</dt>
+            <dd class="min-w-0 text-black/75 dark:text-white/75">{friendProfile.site_title}</dd>
+            <dt class="text-black/45 dark:text-white/45">{t.friends.profile.siteDescription}</dt>
+            <dd class="min-w-0 text-black/65 dark:text-white/65">{friendProfile.description}</dd>
+            <dt class="text-black/45 dark:text-white/45">{t.friends.profile.name}</dt>
+            <dd class="min-w-0 text-black/75 dark:text-white/75">{friendProfile.name}</dd>
+            <dt class="text-black/45 dark:text-white/45">{t.friends.profile.avatar}</dt>
+            <dd class="min-w-0 break-all">
+              <a
+                href={friendProfile.avatar_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-black/70 underline decoration-black/20 underline-offset-2 hover:text-black dark:text-white/70 dark:decoration-white/25 dark:hover:text-white"
+              >{t.friends.profile.avatarLink}</a>
+            </dd>
+            <dt class="text-black/45 dark:text-white/45">{t.friends.profile.website}</dt>
+            <dd class="min-w-0 break-all">
+              <a
+                href={friendProfile.site_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-black/70 underline decoration-black/20 underline-offset-2 hover:text-black dark:text-white/70 dark:decoration-white/25 dark:hover:text-white"
+              >{friendProfile.site_url}</a>
+            </dd>
+          </dl>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-3 border-t border-black/8 pt-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+          <h3 id="friend-contact-title" class="text-sm font-medium text-black/75 dark:text-white/75">
+            {t.friends.contactTitle}
+          </h3>
+          <div class="flex flex-col items-stretch gap-2 sm:items-end">
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                data-open-friend-application
+                class="inline-flex min-h-9 items-center justify-center rounded-full bg-black px-4 text-xs font-medium text-white transition hover:bg-black/80 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-white dark:text-black dark:hover:bg-white/85"
+              >
+                {t.friends.application.open}
+              </button>
+              <button
+                type="button"
+                data-copy-friend-profile
+                data-copied-text={t.friends.profile.copied}
+                data-copy-failed-text={t.friends.profile.copyFailed}
+                data-friend-profile={JSON.stringify(friendProfile)}
+                class="inline-flex min-h-9 items-center justify-center rounded-full border border-black/15 px-4 text-xs font-medium text-black/70 transition hover:border-black/30 hover:bg-black/[0.035] hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-white/20 dark:text-white/75 dark:hover:border-white/35 dark:hover:bg-white/[0.05] dark:hover:text-white"
+              >
+                {t.friends.profile.copy}
+              </button>
+            </div>
+            <p
+              data-friend-profile-copy-status
+              role="status"
+              aria-live="polite"
+              class="min-h-4 text-xs"
+            ></p>
+          </div>
+        </div>
       </section>
 
       <SiteFooter spacing="spacious" />
@@ -145,4 +286,182 @@ const { alternates, locale, t } = getLocalePageContext(
         hideBrokenAvatar(image);
       }
     });
+</script>
+
+<script>
+  const apiBase = import.meta.env.PUBLIC_HUB_API_BASE_URL ?? "https://api-hub.levwu.me/v1";
+  const dialog = document.querySelector<HTMLDialogElement>("[data-friend-application-dialog]");
+  const form = document.querySelector<HTMLFormElement>("[data-friend-application-form]");
+  const status = document.querySelector<HTMLElement>("[data-friend-application-status]");
+  const submitButton = document.querySelector<HTMLButtonElement>("[data-friend-application-submit]");
+  const friendsList = document.querySelector<HTMLUListElement>("[data-friends-list]");
+  const friendsLoadingTemplate = document.querySelector<HTMLTemplateElement>("[data-friends-loading-template]");
+  const friendsLiveStatus = document.querySelector<HTMLElement>("[data-friends-live-status]");
+  const friendCountLabel = document.querySelector<HTMLElement>("[data-friend-count]");
+  const copyProfileButton = document.querySelector<HTMLButtonElement>("[data-copy-friend-profile]");
+  const copyProfileStatus = document.querySelector<HTMLElement>("[data-friend-profile-copy-status]");
+
+  copyProfileButton?.addEventListener("click", async () => {
+    if (!copyProfileButton || !copyProfileStatus) return;
+    try {
+      const profile = JSON.parse(copyProfileButton.dataset.friendProfile ?? "{}") as Record<string, string>;
+      await navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
+      copyProfileStatus.className = "mt-2 min-h-4 text-center text-xs text-emerald-700 dark:text-emerald-300";
+      copyProfileStatus.textContent = copyProfileButton.dataset.copiedText ?? "Copied";
+      window.setTimeout(() => {
+        copyProfileStatus.textContent = "";
+      }, 1800);
+    } catch {
+      copyProfileStatus.className = "mt-2 min-h-4 text-center text-xs text-red-700 dark:text-red-300";
+      copyProfileStatus.textContent = copyProfileButton.dataset.copyFailedText ?? "Could not copy. Select the details manually.";
+    }
+  });
+
+  document.querySelector("[data-open-friend-application]")?.addEventListener("click", () => dialog?.showModal());
+  document.querySelector("[data-close-friend-application]")?.addEventListener("click", () => dialog?.close());
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form || !form.reportValidity() || !submitButton || !status) return;
+    const submitText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = form.dataset.submittingText ?? "Submitting…";
+    status.className = "text-sm";
+    status.textContent = "";
+    try {
+      const payload = Object.fromEntries(new FormData(form).entries());
+      if (!String(payload.email ?? "").trim()) delete payload.email;
+      const response = await fetch(`${apiBase}/friend-applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => null) as { message?: string } | null;
+        if (response.status === 429) throw new Error("rate-limited");
+        if (result?.message === "an active friend application already uses this email address") {
+          throw new Error("duplicate-email");
+        }
+        if (result?.message === "an application for this website is already under review or approved") {
+          throw new Error("duplicate-site");
+        }
+        throw new Error("application-rejected");
+      }
+      status.className = "text-sm text-emerald-700 dark:text-emerald-300";
+      status.textContent = form.dataset.successText ?? "Application received.";
+      form.reset();
+      window.setTimeout(() => dialog?.close(), 1800);
+    } catch (error) {
+      status.className = "text-sm text-red-700 dark:text-red-300";
+      const message = error instanceof Error ? error.message : "";
+      status.textContent = message === "duplicate-email"
+        ? form.dataset.duplicateEmailText ?? form.dataset.errorText ?? "Could not submit your application."
+        : message === "duplicate-site"
+          ? form.dataset.duplicateSiteText ?? form.dataset.errorText ?? "Could not submit your application."
+          : message === "rate-limited"
+            ? form.dataset.rateLimitedText ?? form.dataset.errorText ?? "Could not submit your application."
+            : form.dataset.errorText ?? "Could not submit your application.";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = submitText;
+    }
+  });
+
+  const renderApprovedFriend = (friend: { name: string; site_title: string; site_url: string; avatar_url: string; description: string }) => {
+    if (!friendsList || !friend.site_url.startsWith("https://")) return;
+    if ([...friendsList.querySelectorAll<HTMLAnchorElement>("a")].some((anchor) => anchor.href === friend.site_url)) return;
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = friend.site_url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "group flex min-h-24 items-center gap-4 py-5 no-underline sm:gap-5";
+    const avatar = document.createElement("span");
+    avatar.className = "relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black/[0.055] text-sm font-medium text-black/38 dark:bg-white/[0.09] dark:text-white/42";
+    avatar.textContent = friend.name.slice(0, 1).toUpperCase();
+    if (friend.avatar_url.startsWith("https://")) {
+      const image = document.createElement("img");
+      image.src = friend.avatar_url;
+      image.alt = friend.name;
+      image.width = 56;
+      image.height = 56;
+      image.loading = "lazy";
+      image.referrerPolicy = "no-referrer";
+      image.className = "absolute inset-0 h-full w-full object-cover";
+      image.addEventListener("error", () => image.remove(), { once: true });
+      avatar.append(image);
+    }
+    const details = document.createElement("span");
+    details.className = "min-w-0 flex-1";
+    const name = document.createElement("span");
+    name.className = "block text-base leading-6 font-medium text-black/82 group-hover:text-black dark:text-white/82 dark:group-hover:text-white";
+    name.textContent = friend.name;
+    const description = document.createElement("span");
+    description.className = "mt-1 block text-sm leading-6 text-black/48 dark:text-white/50";
+    description.textContent = `${friend.site_title} · ${friend.description}`;
+    const arrow = document.createElement("span");
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.className = "shrink-0 text-sm text-black/28 dark:text-white/30";
+    arrow.textContent = "↗";
+    details.append(name, description);
+    link.append(avatar, details, arrow);
+    item.append(link);
+    friendsList.append(item);
+  };
+
+  const showFriendsMessage = (message: string, retryText?: string) => {
+    if (!friendsList) return;
+    const item = document.createElement("li");
+    item.className = "flex min-h-24 flex-wrap items-center justify-center gap-x-3 gap-y-2 py-8 text-sm text-black/50 dark:text-white/50";
+    const label = document.createElement("span");
+    label.textContent = message;
+    item.append(label);
+    if (retryText) {
+      const retryButton = document.createElement("button");
+      retryButton.type = "button";
+      retryButton.className = "rounded-full border border-black/15 px-3 py-1 text-xs text-black/70 transition hover:border-black/30 hover:bg-black/[0.035] dark:border-white/20 dark:text-white/75 dark:hover:border-white/35 dark:hover:bg-white/[0.05]";
+      retryButton.textContent = retryText;
+      retryButton.addEventListener("click", () => void loadFriends());
+      item.append(retryButton);
+    }
+    friendsList.replaceChildren(item);
+  };
+
+  const loadFriends = async () => {
+    if (!friendsList) return;
+    const loadingText = friendsList.dataset.loadingText ?? "Loading friends…";
+    friendsList.setAttribute("aria-busy", "true");
+    if (friendsLoadingTemplate) {
+      friendsList.replaceChildren(friendsLoadingTemplate.content.cloneNode(true));
+    }
+    if (friendCountLabel) friendCountLabel.textContent = loadingText;
+    if (friendsLiveStatus) friendsLiveStatus.textContent = loadingText;
+
+    try {
+      const response = await fetch(`${apiBase}/friend-links`);
+      if (!response.ok) throw new Error("friend-links-request-failed");
+      const payload = await response.json() as { data?: Array<{ name: string; site_title: string; site_url: string; avatar_url: string; description: string }> };
+      friendsList.replaceChildren();
+      payload.data?.forEach(renderApprovedFriend);
+      const count = friendsList.querySelectorAll("li").length;
+      const countText = friendCountLabel?.dataset.countTemplate?.replace("{count}", String(count)) ?? String(count);
+      if (friendCountLabel) friendCountLabel.textContent = countText;
+      if (count === 0) showFriendsMessage(friendsList.dataset.emptyText ?? "No friends listed yet.");
+      friendsList.setAttribute("aria-busy", "false");
+      if (friendsLiveStatus) friendsLiveStatus.textContent = count === 0
+        ? friendsList.dataset.emptyText ?? "No friends listed yet."
+        : countText;
+    } catch {
+      const errorText = friendsList.dataset.loadFailedText ?? "Couldn't load friends.";
+      showFriendsMessage(errorText, friendsList.dataset.retryText ?? "Retry");
+      friendsList.setAttribute("aria-busy", "false");
+      if (friendCountLabel) friendCountLabel.textContent = errorText;
+      if (friendsLiveStatus) friendsLiveStatus.textContent = errorText;
+    }
+  };
+
+  void loadFriends();
 </script>
