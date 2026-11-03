@@ -10,7 +10,7 @@ import {
 } from "../../../i18n";
 import Layout from "../../../layouts/Layout.astro";
 
-const MAP_URL = "https://map.lpalette.cn/map/mkIo6X4FryYKOcUzuz4Kew";
+const MAP_URL = import.meta.env.PUBLIC_MAP_EMBED_URL ?? "https://map.lpalette.cn/map/mkIo6X4FryYKOcUzuz4Kew";
 
 export function getStaticPaths() {
   return getLocaleStaticPaths();
@@ -142,6 +142,7 @@ const { alternates, locale, t } = getLocalePageContext(
   const actions = document.querySelector<HTMLDivElement>("#map-actions");
   const retry = document.querySelector<HTMLButtonElement>("#map-retry");
   const dismiss = document.querySelector<HTMLButtonElement>("#map-dismiss");
+  const toolbar = document.querySelector<HTMLElement>(".map-toolbar");
 
   if (iframe && status && statusText && actions && retry && dismiss) {
     const baseUrl = iframe.dataset.baseUrl;
@@ -150,6 +151,17 @@ const { alternates, locale, t } = getLocalePageContext(
     const errorText = status.dataset.errorText ?? "";
     let loadTimer = 0;
     let hideTimer = 0;
+    let photoPreviewOpen = false;
+    let playerModeOpen = false;
+
+    const syncToolbarVisibility = () => {
+      const hidden = photoPreviewOpen || playerModeOpen;
+      toolbar?.classList.toggle("map-toolbar-hidden", hidden);
+      if (toolbar) {
+        toolbar.style.visibility = hidden ? "hidden" : "";
+        toolbar.style.pointerEvents = hidden ? "none" : "";
+      }
+    };
 
     const getTheme = () =>
       document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -158,6 +170,7 @@ const { alternates, locale, t } = getLocalePageContext(
       const url = new URL(baseUrl ?? "", window.location.href);
       url.searchParams.set("theme", getTheme());
       url.searchParams.set("lang", document.documentElement.lang);
+      url.searchParams.set("parentOrigin", window.location.origin);
       const topic = new URL(window.location.href).searchParams.get("topic");
       if (topic) {
         url.searchParams.set("topic", topic);
@@ -206,14 +219,25 @@ const { alternates, locale, t } = getLocalePageContext(
         }
         window.history.replaceState(window.history.state, "", url);
       } else if (event.data.type === "photo-preview-open") {
-        document.querySelector(".map-toolbar")?.classList.add("map-toolbar-hidden");
+        photoPreviewOpen = true;
+        syncToolbarVisibility();
       } else if (event.data.type === "photo-preview-close") {
-        document.querySelector(".map-toolbar")?.classList.remove("map-toolbar-hidden");
+        photoPreviewOpen = false;
+        syncToolbarVisibility();
+      } else if (event.data.type === "player-mode-open") {
+        playerModeOpen = true;
+        syncToolbarVisibility();
+      } else if (event.data.type === "player-mode-close") {
+        playerModeOpen = false;
+        syncToolbarVisibility();
       }
     });
 
     const loadMap = () => {
       if (!baseUrl) return;
+      photoPreviewOpen = false;
+      playerModeOpen = false;
+      syncToolbarVisibility();
       window.clearTimeout(loadTimer);
       showStatus(loadingText, false);
       iframe.setAttribute("aria-busy", "true");
