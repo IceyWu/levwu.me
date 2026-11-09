@@ -21,16 +21,32 @@ interface Props {
    * 不传则每张图保留自身原始比例（横竖混合时可能参差不齐）。
    */
   aspectRatio?: number;
+  /** 单图贴靠正文，让后续段落自然环绕。多图组仍按画廊展示。 */
+  layout?: "gallery" | "editorial" | "flow";
+  /** 编辑式布局中靠哪一侧排布。 */
+  side?: "start" | "end";
 }
 
-const { data = [], columns = 3, aspectRatio } = Astro.props;
+const {
+  data = [],
+  columns = 3,
+  aspectRatio,
+  layout = "gallery",
+  side = "end",
+} = Astro.props;
 
 const GAP = 16;
 const OBJECT_FIT = "cover";
 
 const photos: PhotoData[] = Array.isArray(data) ? data : [];
+const flowLayout =
+  (layout === "flow" || layout === "editorial") && photos.length === 1;
+const editorialLayout = layout === "editorial";
 
-const actualCols = Math.max(1, Math.min(columns, photos.length));
+const actualCols = Math.max(
+  1,
+  Math.min(editorialLayout ? 2 : columns, photos.length),
+);
 const rows = Array.from(
   { length: Math.ceil(photos.length / actualCols) },
   (_, index) => photos.slice(index * actualCols, (index + 1) * actualCols),
@@ -55,7 +71,7 @@ function getPreviewSrc(photo: PhotoData) {
 ---
 
 <div
-  class="photo-list not-prose"
+  class={`photo-list not-prose${editorialLayout ? " photo-list-editorial" : ""}${flowLayout ? " photo-list-flow" : ""}${side === "start" ? " photo-list-side-start" : " photo-list-side-end"}`}
   style={`display:flex;flex-direction:column;gap:${GAP}px`}
 >
   {
@@ -375,6 +391,16 @@ function getPreviewSrc(photo: PhotoData) {
     flex-grow: 0 !important;
   }
 
+  .photo-list-flow .photo-row-single .viewer-pro-item {
+    max-width: 100%;
+    flex-basis: 100% !important;
+  }
+
+  .photo-list-editorial:not(.photo-list-flow) {
+    width: 100%;
+    margin-inline: 0;
+  }
+
   /* 平板：每行最多两张，仍保留各自原始比例。 */
   @media (max-width: 1024px) {
     .photo-row {
@@ -398,5 +424,6 @@ function getPreviewSrc(photo: PhotoData) {
       width: 100%;
       flex-basis: auto !important;
     }
+
   }
 </style>
