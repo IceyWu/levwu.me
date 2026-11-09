@@ -25,6 +25,39 @@ const {
 } = getLocalePageContext(Astro.props as LocalePageProps);
 const t = translations.home;
 const stats = await getGithubStats();
+const openingText =
+  locale === "zh-CN"
+    ? "把日子，慢慢过成喜欢的样子。"
+    : "Make a life that feels like yours.";
+const openingCaption =
+  locale === "zh-CN"
+    ? "“留一点时间，给正在发生的事。”"
+    : '"Stay a little longer with what is here."';
+
+const splitOpeningText = (text: string, step = 25, offset = 0) => {
+  const characters = Array.from(text);
+  const midpoint = characters.length / 2;
+
+  return characters.map((character, index) => {
+    const distance =
+      characters.length % 2 === 1
+        ? Math.abs(index - Math.floor(midpoint))
+        : Math.min(
+            Math.abs(index - (midpoint - 1)),
+            Math.abs(index - midpoint),
+          );
+    const randomOffset = () => (Math.random() * 100 - 50).toFixed(2);
+    const scale = (2 + Math.random()).toFixed(3);
+
+    return {
+      character: character === " " ? "\u00a0" : character,
+      style: `--opening-x:${randomOffset()}%;--opening-y:${randomOffset()}%;--opening-scale:${scale};--opening-delay:${offset + distance * step}ms`,
+    };
+  });
+};
+
+const openingTextCharacters = splitOpeningText(openingText);
+const openingCaptionCharacters = splitOpeningText(openingCaption, 2, 200);
 
 const fallbackLanguages: Record<string, number> = {
   TypeScript: 45,
@@ -71,6 +104,20 @@ const techSummary = interpolate(t.techSummary, {
   alternates={homeAlternates}
   detectLocale={locale === DEFAULT_LOCALE}
 >
+  <div class="home-opening" aria-hidden="true">
+    <div class="home-opening__copy">
+      <p>
+        {openingTextCharacters.map(({ character, style }) => (
+          <span class="home-opening__char" style={style}>{character}</span>
+        ))}
+      </p>
+      <span class="home-opening__caption">
+        {openingCaptionCharacters.map(({ character, style }) => (
+          <span class="home-opening__char" style={style}>{character}</span>
+        ))}
+      </span>
+    </div>
+  </div>
   <div
     id="main-content"
     role="main"
@@ -258,6 +305,130 @@ const techSummary = interpolate(t.techSummary, {
 </Layout>
 
 <style>
+  .home-opening {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    color: #111;
+    background: #fff;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    filter: blur(0);
+  }
+
+  :global(.dark) .home-opening {
+    color: #eee;
+    background: #080808;
+  }
+
+  .home-opening__copy {
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .home-opening__copy p {
+    margin: 0;
+    font-family: Georgia, "Songti SC", SimSun, serif;
+    font-size: clamp(1.125rem, 5.5vw, 1.5rem);
+    line-height: 1;
+  }
+
+  @media (min-width: 48rem) {
+    .home-opening__copy p {
+      font-size: clamp(1.333rem, 1.6667vw, 2rem);
+    }
+  }
+
+  .home-opening__caption {
+    display: block;
+    margin-top: 0.75rem;
+    color: currentColor;
+    font-family: Georgia, serif;
+    font-size: 0.875rem;
+    line-height: 1;
+    opacity: 0.68;
+  }
+
+  .home-opening__char {
+    display: inline-block;
+    transform: translate3d(
+        var(--opening-x),
+        var(--opening-y),
+        0
+      )
+      scale(var(--opening-scale));
+    opacity: 0;
+    filter: blur(0.625rem);
+    will-change: transform, opacity, filter;
+  }
+
+  :global(html[data-enter-mode="full"]) .home-opening__char {
+    animation-name: opening-char-transform, opening-char-opacity,
+      opening-char-filter;
+    animation-duration: 1.4s, 1s, 1.2s;
+    animation-timing-function:
+      cubic-bezier(0.215, 0.61, 0.355, 1), linear,
+      cubic-bezier(0.215, 0.61, 0.355, 1);
+    animation-delay: var(--opening-delay);
+    animation-fill-mode: both;
+  }
+
+  @keyframes opening-char-transform {
+    0% {
+      transform: translate3d(
+          var(--opening-x),
+          var(--opening-y),
+          0
+        )
+        scale(var(--opening-scale));
+    }
+    100% {
+      transform: none;
+    }
+  }
+
+  @keyframes opening-char-opacity {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes opening-char-filter {
+    to {
+      filter: blur(0);
+    }
+  }
+
+  :global(html[data-enter-mode="full"]) .home-opening {
+    visibility: visible;
+    animation: opening-screen 3.4s linear both;
+  }
+
+  @keyframes opening-screen {
+    0%,
+    70.588% {
+      opacity: 1;
+      filter: blur(0);
+      visibility: visible;
+      animation-timing-function: ease;
+    }
+    100% {
+      opacity: 0;
+      filter: blur(0.625rem);
+      visibility: hidden;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html[data-enter-mode="full"]) .home-opening {
+      display: none;
+    }
+  }
+
   .avatar-frame,
   .avatar-frame::before,
   .avatar-frame::after,
