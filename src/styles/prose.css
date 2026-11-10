@@ -171,7 +171,7 @@
 
 .article-content > .photo-list.photo-list-flow {
   float: inline-end;
-  width: min(44%, 18rem);
+  width: min(40%, 16rem);
   margin-block: 0.35em 1.1em;
 }
 
@@ -189,7 +189,69 @@
   clear: both;
 }
 
+.article-content > .essay-photo-pair {
+  clear: both;
+  display: grid;
+  grid-template-columns: minmax(0, 9fr) minmax(0, 16fr);
+  gap: 1rem;
+  margin-block: 1.4rem;
+}
+
+.article-content > .essay-photo-story {
+  clear: both;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 16rem);
+  gap: 1.5rem;
+  align-items: center;
+  margin-block: 1.5rem;
+}
+
+.article-content > .essay-photo-story-start {
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+}
+
+.essay-photo-story > .photo-list {
+  width: 100%;
+  margin: 0;
+}
+
+.essay-photo-story .essay-photo-copy > p:first-child {
+  margin-top: 0;
+}
+
+.essay-photo-story .essay-photo-copy > p:last-child {
+  margin-bottom: 0;
+}
+
+.essay-photo-pair > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.essay-photo-pair > div > p:first-child {
+  margin-top: 0;
+}
+
+.essay-photo-pair > div > p:last-of-type {
+  margin-bottom: 1rem;
+}
+
+.essay-photo-pair > div > .photo-list {
+  margin-top: auto;
+}
+
 @media (max-width: 40rem) {
+  .article-content > .essay-photo-story,
+  .article-content > .essay-photo-story-start {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .article-content > .essay-photo-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+  }
+
   .article-content > .photo-list.photo-list-flow {
     width: min(46%, 15rem);
   }
