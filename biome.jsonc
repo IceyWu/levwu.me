@@ -18,7 +18,8 @@
         "noIncrementDecrement": "off"
       },
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "useBaseline": "off"
       }
     }
   }

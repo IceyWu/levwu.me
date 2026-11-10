@@ -7,7 +7,7 @@ const articleSchema = z.object({
   description: z.string().optional().default(""),
   draft: z.boolean().optional().default(false),
   lang: z.enum(["zh-CN", "en"]).default("zh-CN"),
-  route: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  route: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
   tags: z.array(z.string()).optional().default([]),
   title: z.string(),
   translationKey: z.string(),

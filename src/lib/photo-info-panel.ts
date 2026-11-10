@@ -24,6 +24,8 @@ interface FileDetail {
 }
 
 const pendingDetails = new Map<string, Promise<FileDetail>>();
+const MAP_BASE_URL =
+  import.meta.env.PUBLIC_MAP_BASE_URL || "https://map.lpalette.cn";
 const icons: Record<string, string> = {
   aperture:
     "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M14 2l-3 6 M22 9h-7 M18 20l-4-6 M8 22l3-6 M2 15h7 M6 4l4 6",
@@ -113,63 +115,87 @@ function formatDate(value: string | null) {
   });
 }
 
-async function mountMap(container: HTMLElement, lng: number, lat: number) {
-  const token = import.meta.env.PUBLIC_MAPBOX_TOKEN || "";
-  if (!token) {
-    container.replaceChildren(
-      element("p", "photo-info-message", "地图暂不可用")
-    );
-    return;
-  }
-  try {
-    const [{ default: mapboxgl }, { default: MapboxLanguage }] =
-      await Promise.all([
-        import("mapbox-gl"),
-        import("@mapbox/mapbox-gl-language"),
-      ]);
-    if (!container.isConnected) {
+function mountMap(container: HTMLElement, lng: number, lat: number) {
+  const mapUrl = new URL("embed", `${MAP_BASE_URL.replace(/\/+$/u, "")}/`);
+  mapUrl.searchParams.set("parentOrigin", window.location.origin);
+
+  const iframe = document.createElement("iframe");
+  iframe.title = "拍摄地点地图";
+  iframe.allow = "fullscreen";
+  iframe.loading = "lazy";
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  iframe.style.cssText = "display:block;width:100%;height:100%;border:0";
+
+  let disposed = false;
+  let observer: MutationObserver | undefined;
+  let timeout = 0;
+  const dispose = () => {
+    if (disposed) {
       return;
     }
-    const map = new mapboxgl.Map({
-      accessToken: token,
-      attributionControl: false,
-      center: [lng, lat],
-      container,
-      interactive: false,
-      style: "mapbox://styles/mapbox/dark-v11",
-      zoom: 12,
-    });
-    map.addControl(new MapboxLanguage({ defaultLanguage: "zh-Hans" }));
-    map.on("load", () => {
-      new mapboxgl.Marker({ color: "#60a5fa" })
-        .setLngLat([lng, lat])
-        .addTo(map);
-      map.resize();
-    });
-    map.on("error", () => {
-      if (!map.loaded()) {
-        container.dataset.mapError = "true";
-      }
-    });
-    const observer = new MutationObserver(() => {
-      const preview = container.closest(".image-preview-container");
-      if (!(container.isConnected && preview?.classList.contains("active"))) {
-        observer.disconnect();
-        map.remove();
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    const preview = container.closest(".image-preview-container");
-    if (preview) {
-      observer.observe(preview, {
-        attributeFilter: ["class"],
-        attributes: true,
-      });
+    disposed = true;
+    window.clearTimeout(timeout);
+    window.removeEventListener("message", onMessage);
+    observer?.disconnect();
+    iframe.src = "about:blank";
+  };
+  const fail = () => {
+    if (disposed) {
+      return;
     }
-  } catch {
+    dispose();
     container.replaceChildren(
       element("p", "photo-info-message", "地图加载失败")
     );
+  };
+  const onMessage = (event: MessageEvent) => {
+    if (
+      event.origin !== mapUrl.origin ||
+      event.source !== iframe.contentWindow ||
+      event.data?.channel !== "lifepalette-map"
+    ) {
+      return;
+    }
+    if (event.data.type === "embed-ready") {
+      window.clearTimeout(timeout);
+      iframe.contentWindow?.postMessage(
+        {
+          channel: "lifepalette-map",
+          options: {
+            autoFitBounds: true,
+            hostData: true,
+            interactive: false,
+            isDark: true,
+            location: { lat, lng },
+            mode: "point",
+            showGallery: true,
+          },
+          type: "map-init",
+        },
+        mapUrl.origin
+      );
+    }
+  };
+
+  window.addEventListener("message", onMessage);
+  iframe.addEventListener("error", fail, { once: true });
+  container.replaceChildren(iframe);
+  iframe.src = mapUrl.href;
+  timeout = window.setTimeout(fail, 20_000);
+
+  observer = new MutationObserver(() => {
+    const preview = container.closest(".image-preview-container");
+    if (!(container.isConnected && preview?.classList.contains("active"))) {
+      dispose();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  const preview = container.closest(".image-preview-container");
+  if (preview) {
+    observer.observe(preview, {
+      attributeFilter: ["class"],
+      attributes: true,
+    });
   }
 }
 
@@ -223,7 +249,7 @@ function renderColors(container: HTMLElement, detail: FileDetail) {
   const colors = (detail.colors || [])
     .slice()
     .sort((a, b) => a.rank - b.rank)
-    .filter((entry) => /^#[0-9a-f]{6}$/i.test(entry.color?.hex || ""));
+    .filter((entry) => /^#[0-9a-f]{6}$/iu.test(entry.color?.hex || ""));
   if (colors.length) {
     const block = section(container, "色彩");
     const swatches = element("div", "photo-info-swatches");

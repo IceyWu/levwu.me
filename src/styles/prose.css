@@ -217,6 +217,7 @@
 }
 
 .article-content h2 {
+  clear: both;
   margin-top: 2.4em;
   margin-bottom: 0.75em;
   font-size: 1.5rem;
@@ -224,6 +225,7 @@
 }
 
 .article-content h3 {
+  clear: both;
   margin-top: 2em;
   margin-bottom: 0.65em;
   font-size: 1.25rem;
